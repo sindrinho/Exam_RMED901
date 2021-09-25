@@ -80,7 +80,7 @@ install.packages(c("finalfit", "skimr", "naniar"))
 
 ```
 
-Checking for missing values. ff_glimpse gives a percentage. 
+Checking for missing values. ff_glimpse gives a percentage. a max on col_rec_tat of 61370.2 where the mean is 7.2 indicates an outlier/plotting mistake
 ```{r}
 is.na(covid)
 ff_glimpse(covid)
@@ -92,9 +92,82 @@ find outliers. Making histiograms of the continous variables.
 ```{r}
 library(ggplot2)
 
+hist_age_m <-
 ggplot(covid) +
   aes(x = age_male) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+```
+
+
+```{r}
+hist_age_f <-
+ggplot(covid) +
+  aes(x = age_female) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+```{r}
+hist_pan_day <-
+ggplot(covid) +
+  aes(x = pan_day) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+
+
+```{r}
+hist_rec_ver_tat <-
+ggplot(covid) +
+  aes(x = rec_ver_tat) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+
+
+```{r}
+hist_col_rec_tat <-
+ggplot(covid) +
+  aes(x = col_rec_tat) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+
+
+```{r}
+hist_ct_result <-
+ggplot(covid) +
+  aes(x = ct_result) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+
+
+time spent waiting for the test result in the start vs the end of the pandemic. Development. 
+
+```{r}
+covid %>% 
+  ggplot(aes(x = pan_day, y = col_rec_tat)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor()
+  
+
+
+```
+remove outlier >50. Result did not change regardles of level set for removing outlier (>24)
+Conclusion: Time from test to result did not change from the start to the end
+
+```{r}
+filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(x = pan_day, y = col_rec_tat)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor()
+  
+```
+
+```{r}
+
 ```
 
