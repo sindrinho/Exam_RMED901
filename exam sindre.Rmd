@@ -166,8 +166,49 @@ filter(covid, col_rec_tat < 50) %>%
   ggpubr::stat_cor()
   
 ```
+Number of tests by gender. More tests among females
 
 ```{r}
+covid %>% 
+count(gender)
+```
+
+lin reg of test results time stratified by gender
+
+
+```{r}
+  filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(x = pan_day, y = col_rec_tat)) +
+    geom_point(aes(color = gender)) +
+  geom_smooth(aes(linetype = gender), method = "lm") +
+  facet_grid(gender ~ .)
+
+  
+```
+
+
+
+Are there more positive tests in the drive-through?
+Filter out the positive results, count the freq of drive through or not among these. 
+Result: more positive test in drivethrough
+
+```{r}
+  pos <-
+    filter(covid, result == "positive")
 
 ```
+
+```{r}
+pos %>% 
+  count(drive_thru_ind)
+```
+
+Is the age of the individual associated with whether the test result is negative or positive?
+
+```{r}
+covid %>% 
+  ggplot(aes(x = age_female)) +
+  geom_point()
+```
+
 
