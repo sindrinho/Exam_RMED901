@@ -29,5 +29,72 @@ print(covid)
 summarise(covid)
 head(covid)
 tail(covid)
-check(covid)
+glimpse(covid)
+count(covid)
 ```
+Create tibble
+```{r}
+covid <- as_tibble(covid)
+```
+
+
+
+1st column includes both name and number, possible ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the seperate marker. 
+
+```{r}
+covid <-
+  covid %>% 
+  separate(subject, c("id_number", "first_name", "surname"), "-")
+```
+
+Make column names uniform related to denominator. Use underscore for all
+
+```{r}
+covid <-
+  rename(covid, pan_day = pan.day)
+```
+
+Create separate column for gender. Mutate to create a new column based on missing value in the age_female group. This one did not work, not sure why. 
+```{r}
+mutate(covid, gender = if_else(age_female == NA, "F", "F", "M"))
+```
+Created seperate column for gender using values >= 0 instead of basing it on NA. Worked, however, less elegant.
+
+```{r}
+covid <-
+  covid %>% 
+  mutate(gender = case_when(
+    age_female >= 0 ~ "F", age_male >= 0 ~ "M")
+  )
+```
+
+
+```{r}
+glimpse(covid)
+summarise(covid)
+```
+
+
+```{r}
+install.packages(c("finalfit", "skimr", "naniar"))
+
+```
+
+Checking for missing values. ff_glimpse gives a percentage. 
+```{r}
+is.na(covid)
+ff_glimpse(covid)
+skimr::skim(covid)
+```
+
+find outliers. Making histiograms of the continous variables.
+
+```{r}
+library(ggplot2)
+
+ggplot(covid) +
+  aes(x = age_male) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+```
+
