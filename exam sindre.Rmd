@@ -206,9 +206,41 @@ pos %>%
 Is the age of the individual associated with whether the test result is negative or positive?
 
 ```{r}
+ filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(y = age_female, x = result)) +
+    geom_point(aes(color = result)) +
+  geom_jitter(alpha = 0.4)
+  
+```
+
+```{r}
 covid %>% 
-  ggplot(aes(x = age_female)) +
-  geom_point()
+  ggplot(aes(x = result, y = age_female)) +
+  geom_boxplot() +
+  ggpubr::stat_compare_means()
+```
+
+```{r}
+covid %>% 
+  ggplot(aes(x = result, y = age_male)) +
+  geom_boxplot() +
+  ggpubr::stat_compare_means()
+```
+converting into logarithm
+
+```{r}
+covid %>% 
+  mutate(log_age_f = log(age_female)) %>% 
+  ggplot(aes(x = log_age_f)) +
+  geom_histogram() +
+  facet_grid(~result)
 ```
 
 
+running anova
+```{r}
+covid %>% 
+  mutate(agef = log(age_female)) %>% 
+  aov(agef ~ result, data = .)
+
+```
