@@ -17,6 +17,7 @@ library(here)
 library(tibble)
 ```
 
+TASK 2
 
 Import exam data file
 ```{r}
@@ -39,7 +40,7 @@ covid <- as_tibble(covid)
 
 
 
-1st column includes both name and number, possible ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the seperate marker. 
+1st column includes both name and ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the separate marker. 
 
 ```{r}
 covid <-
@@ -54,11 +55,11 @@ covid <-
   rename(covid, pan_day = pan.day)
 ```
 
-Create separate column for gender. Mutate to create a new column based on missing value in the age_female group. This one did not work, not sure why. 
+Create separate column for gender. Mutate to create a new column based on missing value in the age_female group. This one did not work, not sure why, but it probably interprets NA as the "else" factor.
 ```{r}
 mutate(covid, gender = if_else(age_female == NA, "F", "F", "M"))
 ```
-Created seperate column for gender using values >= 0 instead of basing it on NA. Worked, however, less elegant.
+Created separate column for gender using values >= 0 instead of basing it on NA. Worked, however, less elegant.
 
 ```{r}
 covid <-
@@ -68,6 +69,7 @@ covid <-
   )
 ```
 
+TASK 3
 
 ```{r}
 glimpse(covid)
@@ -97,6 +99,7 @@ ggplot(covid) +
   aes(x = age_male) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_age_m)
 ```
 
 
@@ -106,13 +109,16 @@ ggplot(covid) +
   aes(x = age_female) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_age_f)
 ```
+
 ```{r}
 hist_pan_day <-
 ggplot(covid) +
   aes(x = pan_day) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_pan_day)
 ```
 
 
@@ -122,6 +128,7 @@ ggplot(covid) +
   aes(x = rec_ver_tat) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_rec_ver_tat)
 ```
 
 
@@ -131,6 +138,7 @@ ggplot(covid) +
   aes(x = col_rec_tat) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_col_rec_tat)
 ```
 
 
@@ -140,10 +148,11 @@ ggplot(covid) +
   aes(x = ct_result) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
   theme_minimal()
+print(hist_ct_result)
 ```
 
 
-time spent waiting for the test result in the start vs the end of the pandemic. Development. 
+Time spent waiting for the test result in the start vs the end of the pandemic. Development:
 
 ```{r}
 covid %>% 
@@ -166,7 +175,8 @@ filter(covid, col_rec_tat < 50) %>%
   ggpubr::stat_cor()
   
 ```
-Number of tests by gender. More tests among females
+Number of tests by gender. 
+Conclusion: More tests among females
 
 ```{r}
 covid %>% 
@@ -186,7 +196,7 @@ lin reg of test results time stratified by gender
   
 ```
 
-
+TASK 4:
 
 Are there more positive tests in the drive-through?
 Filter out the positive results, count the freq of drive through or not among these. 
@@ -236,11 +246,5 @@ covid %>%
   facet_grid(~result)
 ```
 
-
-running anova
-```{r}
-covid %>% 
-  mutate(agef = log(age_female)) %>% 
-  aov(agef ~ result, data = .)
-
-```
+Result:
+In both genders, higher age were associated with an increase chance of a positive test.
