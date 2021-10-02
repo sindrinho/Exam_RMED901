@@ -2,7 +2,9 @@
 title: "20120924_exam_rmed901_sindre_grindheim"
 author: "Sindre Grindheim"
 date: "9/25/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 First I install and load data packages needed. 
@@ -40,7 +42,7 @@ covid <- as_tibble(covid)
 
 
 
-1st column includes both name and ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the separate marker. 
+1st column includes both  name and ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the separate marker. 
 
 ```{r}
 covid <-
@@ -94,7 +96,7 @@ find outliers. Making histiograms of the continous variables.
 ```{r}
 library(ggplot2)
 
-hist_age_m <-
+hist_age_m <- #plot for male
 ggplot(covid) +
   aes(x = age_male) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
@@ -104,7 +106,7 @@ print(hist_age_m)
 
 
 ```{r}
-hist_age_f <-
+hist_age_f <- #plot for female
 ggplot(covid) +
   aes(x = age_female) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
@@ -113,7 +115,7 @@ print(hist_age_f)
 ```
 
 ```{r}
-hist_pan_day <-
+hist_pan_day <- #plot for pandemy day
 ggplot(covid) +
   aes(x = pan_day) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
@@ -123,7 +125,7 @@ print(hist_pan_day)
 
 
 ```{r}
-hist_rec_ver_tat <-
+hist_rec_ver_tat <- #plot for recieved to verification time
 ggplot(covid) +
   aes(x = rec_ver_tat) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
@@ -133,7 +135,7 @@ print(hist_rec_ver_tat)
 
 
 ```{r}
-hist_col_rec_tat <-
+hist_col_rec_tat #plot for collect to recieve time
 ggplot(covid) +
   aes(x = col_rec_tat) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
@@ -143,7 +145,7 @@ print(hist_col_rec_tat)
 
 
 ```{r}
-hist_ct_result <-
+hist_ct_result <- #plot cycle threshold
 ggplot(covid) +
   aes(x = ct_result) +
   geom_histogram(bins = 30L, fill = "#0c4c8a") +
