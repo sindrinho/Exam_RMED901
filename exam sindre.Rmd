@@ -2,29 +2,251 @@
 title: "20120924_exam_rmed901_sindre_grindheim"
 author: "Sindre Grindheim"
 date: "9/25/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+First I install and load data packages needed. 
+```{r}
+install.packages("tidyverse")
+install.packages("here")
+install.packages("tibble")
+```
+```{r}
+library(tidyverse)
+library(here)
+library(tibble)
 ```
 
-## R Markdown
+TASK 2
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+Import exam data file
+```{r}
+covid <-
+  read.delim("/Users/sindregrindheim/Desktop/RMED901/2021_09_24_RMED901_Exam_Sindre_Grindheim/DATA/exam_data.txt", sep = "\t")
+print(covid)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+summarise(covid)
+head(covid)
+tail(covid)
+glimpse(covid)
+count(covid)
+```
+Create tibble
+```{r}
+covid <- as_tibble(covid)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+1st column includes both  name and ID number. These have to be separated. Use separate function, naming the column needed to be split, create a new vector with the new column names, and name the separate marker. 
+
+```{r}
+covid <-
+  covid %>% 
+  separate(subject, c("id_number", "first_name", "surname"), "-")
+```
+
+Make column names uniform related to denominator. Use underscore for all
+
+```{r}
+covid <-
+  rename(covid, pan_day = pan.day)
+```
+
+Create separate column for gender. Mutate to create a new column based on missing value in the age_female group. This one did not work, not sure why, but it probably interprets NA as the "else" factor.
+```{r}
+mutate(covid, gender = if_else(age_female == NA, "F", "F", "M"))
+```
+Created separate column for gender using values >= 0 instead of basing it on NA. Worked, however, less elegant.
+
+```{r}
+covid <-
+  covid %>% 
+  mutate(gender = case_when(
+    age_female >= 0 ~ "F", age_male >= 0 ~ "M")
+  )
+```
+
+TASK 3
+
+```{r}
+glimpse(covid)
+summarise(covid)
+```
+
+
+```{r}
+install.packages(c("finalfit", "skimr", "naniar"))
+
+```
+
+Checking for missing values. ff_glimpse gives a percentage. a max on col_rec_tat of 61370.2 where the mean is 7.2 indicates an outlier/plotting mistake
+```{r}
+is.na(covid)
+ff_glimpse(covid)
+skimr::skim(covid)
+```
+
+find outliers. Making histiograms of the continous variables.
+
+```{r}
+library(ggplot2)
+
+hist_age_m <- #plot for male
+ggplot(covid) +
+  aes(x = age_male) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_age_m)
+```
+
+
+```{r}
+hist_age_f <- #plot for female
+ggplot(covid) +
+  aes(x = age_female) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_age_f)
+```
+
+```{r}
+hist_pan_day <- #plot for pandemy day
+ggplot(covid) +
+  aes(x = pan_day) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_pan_day)
+```
+
+
+```{r}
+hist_rec_ver_tat <- #plot for recieved to verification time
+ggplot(covid) +
+  aes(x = rec_ver_tat) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_rec_ver_tat)
+```
+
+
+```{r}
+hist_col_rec_tat #plot for collect to recieve time
+ggplot(covid) +
+  aes(x = col_rec_tat) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_col_rec_tat)
+```
+
+
+```{r}
+hist_ct_result <- #plot cycle threshold
+ggplot(covid) +
+  aes(x = ct_result) +
+  geom_histogram(bins = 30L, fill = "#0c4c8a") +
+  theme_minimal()
+print(hist_ct_result)
+```
+
+
+Time spent waiting for the test result in the start vs the end of the pandemic. Development:
+
+```{r}
+covid %>% 
+  ggplot(aes(x = pan_day, y = col_rec_tat)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor()
+  
+
+
+```
+remove outlier >50. Result did not change regardles of level set for removing outlier (>24)
+Conclusion: Time from test to result did not change from the start to the end
+
+```{r}
+filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(x = pan_day, y = col_rec_tat)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ggpubr::stat_cor()
+  
+```
+Number of tests by gender. 
+Conclusion: More tests among females
+
+```{r}
+covid %>% 
+count(gender)
+```
+
+lin reg of test results time stratified by gender
+
+
+```{r}
+  filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(x = pan_day, y = col_rec_tat)) +
+    geom_point(aes(color = gender)) +
+  geom_smooth(aes(linetype = gender), method = "lm") +
+  facet_grid(gender ~ .)
+
+  
+```
+
+TASK 4:
+
+Are there more positive tests in the drive-through?
+Filter out the positive results, count the freq of drive through or not among these. 
+Result: more positive test in drivethrough
+
+```{r}
+  pos <-
+    filter(covid, result == "positive")
+
+```
+
+```{r}
+pos %>% 
+  count(drive_thru_ind)
+```
+
+Is the age of the individual associated with whether the test result is negative or positive?
+
+```{r}
+ filter(covid, col_rec_tat < 50) %>%
+   ggplot(aes(y = age_female, x = result)) +
+    geom_point(aes(color = result)) +
+  geom_jitter(alpha = 0.4)
+  
+```
+
+```{r}
+covid %>% 
+  ggplot(aes(x = result, y = age_female)) +
+  geom_boxplot() +
+  ggpubr::stat_compare_means()
+```
+
+```{r}
+covid %>% 
+  ggplot(aes(x = result, y = age_male)) +
+  geom_boxplot() +
+  ggpubr::stat_compare_means()
+```
+converting into logarithm
+
+```{r}
+covid %>% 
+  mutate(log_age_f = log(age_female)) %>% 
+  ggplot(aes(x = log_age_f)) +
+  geom_histogram() +
+  facet_grid(~result)
+```
+
+Result:
+In both genders, higher age were associated with an increase chance of a positive test.
